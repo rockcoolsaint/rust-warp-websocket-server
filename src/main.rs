@@ -4,6 +4,7 @@ use tokio::sync::{mpsc, Mutex};
 use warp::{ws::Message, Filter, Rejection};
 
 mod handlers;
+mod models;
 mod workers;
 mod ws;
 
