@@ -1,7 +1,7 @@
 use serde::de;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct OfferData {
     #[serde(deserialize_with = "de_float_from_str")]
     pub price: f32,
@@ -9,7 +9,7 @@ pub struct OfferData {
     pub size: f32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DepthStreamData {
     pub last_update_id: usize,
@@ -17,7 +17,7 @@ pub struct DepthStreamData {
     pub asks: Vec<OfferData>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DepthStreamWrapper {
     pub stream: String,
     pub data: DepthStreamData,

@@ -1,9 +1,10 @@
-use crate::Clients;
+use crate::{models, Clients};
 use chrono::{DateTime, Utc};
 use rand::prelude::*;
 use serde::Serialize;
 use tokio;
 use tokio::time::Duration;
+use tungstenite::{client::AutoStream, WebSocket};
 use warp::ws::Message;
 
 #[derive(Serialize)]
@@ -26,7 +27,7 @@ fn generate_random_data() -> Vec<TestData> {
   return test_data_batch;
 }
 
-pub async fn main_worker(clients: Clients) {
+pub async fn main_worker(clients: Clients, mut socket: WebSocket<AutoStream>) {
     loop {
         tokio::time::sleep(Duration::from_millis(2000)).await;
 
@@ -37,13 +38,30 @@ pub async fn main_worker(clients: Clients) {
         }
         println!("{} connected client(s)", connected_client_count);
 
-        let test_data_batch = generate_random_data();
+        let msg = socket.read_message().expect("Error reading message");
+        let msg = match msg {
+            tungstenite::Message::Text(s) => s,
+            _ => {
+                panic!("Error getting text");
+            }
+        };
+        
+        let parsed: models::DepthStreamWrapper = serde_json::from_str(&msg).expect("Can't parse");
+        for i in 0..parsed.data.asks.len() {
+            println!(
+                "{}: {}. ask: {}, size: {}",
+                parsed.stream, i, parsed.data.asks[i].price, parsed.data.asks[i].size
+            );
+        }
+        
+        // let test_data_batch = generate_random_data(); // No longer needed as data is getting fetched directly from binance
         clients.lock().await.iter().for_each(|(_, client)| {
             if let Some(sender) = &client.sender {
                 let _ = sender.send(Ok(Message::text(
-                    serde_json::to_string(&test_data_batch).unwrap(),
+                    serde_json::to_string(&parsed).unwrap(),
                 )));
             }
         });
+
     }
 }
