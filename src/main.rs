@@ -51,3 +51,21 @@ async fn main() {
 fn with_clients(clients: Clients) -> impl Filter<Extract = (Clients,), Error = Infallible> + Clone {
     warp::any().map(move || clients.clone())
 }
+
+fn calc_triangle_step(
+    trade_amount: f64,
+    ask_price: f64,
+    bid_price: f64,
+    pair_name: &str,
+    triangle_part: &str,
+) -> f64 {
+    // Compare first part of the part to the part of the triangle
+    // to determine on what side of the trade we should be
+    if pair_name[..triangle_part.len()] == *triangle_part {
+        // sell side
+        trade_amount * bid_price
+    } else {
+        // buy side
+        trade_amount / ask_price
+    }
+}
