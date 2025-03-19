@@ -23,6 +23,15 @@ pub struct DepthStreamWrapper {
     pub data: DepthStreamData,
 }
 
+#[derive(Debug, Serialize, Clone)]
+pub struct TriangleArbitrageData {
+    pub triangle: [String; 3],
+    pub profits: Vec<f64>,
+    pub start_pair_data: DepthStreamWrapper,
+    pub mid_pair_data: DepthStreamWrapper,
+    pub end_pair_data: DepthStreamWrapper,
+}
+
 pub fn de_float_from_str<'a, D>(deserializer: D) -> Result<f32, D::Error>
 where
     D: Deserializer<'a>,
