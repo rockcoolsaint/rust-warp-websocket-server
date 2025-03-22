@@ -1,4 +1,6 @@
-use crate::{models, Clients};
+use std::collections::HashMap;
+
+use crate::{models::{self, DepthStreamWrapper}, Clients};
 use chrono::{DateTime, Utc};
 use rand::prelude::*;
 use serde::Serialize;
