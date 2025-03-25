@@ -30,7 +30,7 @@ fn generate_random_data() -> Vec<TestData> {
 }
 
 pub async fn main_worker(clients: Clients, mut socket: WebSocket<AutoStream>) {
-    let mut pairs_data: HashMap<String, DepthStreamData> = HashMap::new();
+    let mut pairs_data: HashMap<String, DepthStreamWrapper> = HashMap::new();
     loop {
         // tokio::time::sleep(Duration::from_millis(2000)).await;
 
@@ -122,22 +122,22 @@ async fn process_triangle_data(
     for i in 0..start_pair_data.data.asks.len() {
         let mut triangle_profit = calc_triangle_step(
             1.0,
-            start_pair_data.data.asks[i].price,
-            start_pair_data.data.bids[i].price,
+            start_pair_data.data.asks[i].price.into(),
+            start_pair_data.data.bids[i].price.into(),
             start_pair,
             triangle[0],
         );
         triangle_profit = calc_triangle_step(
             triangle_profit,
-            mid_pair_data.data.asks[i].price,
-            mid_pair_data.data.bids[i].price,
+            mid_pair_data.data.asks[i].price.into(),
+            mid_pair_data.data.bids[i].price.into(),
             mid_pair,
             triangle[1],
         );
         triangle_profit = calc_triangle_step(
             triangle_profit,
-            end_pair_data.data.asks[i].price,
-            end_pair_data.data.bids[i].price,
+            end_pair_data.data.asks[i].price.into(),
+            end_pair_data.data.bids[i].price.into(),
             end_pair,
             triangle[2],
         );
